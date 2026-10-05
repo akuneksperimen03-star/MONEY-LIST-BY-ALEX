@@ -1,4 +1,4 @@
-name: Build APK DAFTAR UANG
+name: Build APK LIST MONEY
 
 on:
   workflow_dispatch:
@@ -11,26 +11,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Ambil kode repository
+
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Siapkan Java
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Siapkan Android SDK
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Terima lisensi Android SDK
-        run: yes | sdkmanager --licenses
+      - name: Accept Android licenses
+        shell: bash
+        run: |
+          yes | sdkmanager --licenses
 
-      - name: Install Android SDK
+      - name: Install Android SDK packages
+        shell: bash
         run: |
           sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Buat project Android
+      - name: Create Android project
+        shell: bash
         run: |
           mkdir -p app/src/main/java/com/alex/listmoney
           mkdir -p app/src/main/assets
@@ -54,13 +59,13 @@ jobs:
               }
           }
 
-          rootProject.name = "LIST-MONEY-By-ALEX"
+          rootProject.name = "LIST-MONEY"
           include(":app")
           EOF
 
           cat > build.gradle <<'EOF'
           plugins {
-              id 'com.android.application' version '8.7.3' apply false
+              id 'com.android.application' version '8.6.1' apply false
           }
           EOF
 
@@ -84,11 +89,12 @@ jobs:
           EOF
 
           cat > app/src/main/AndroidManifest.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
               <application
-                  android:theme="@android:style/Theme.Material.Light.NoActionBar"
                   android:label="LIST MONEY"
+                  android:theme="@android:style/Theme.Material.Light.NoActionBar"
                   android:hardwareAccelerated="true">
 
                   <activity
@@ -126,13 +132,14 @@ jobs:
                   super.onCreate(savedInstanceState);
 
                   webView = new WebView(this);
-                  webView.setWebViewClient(new WebViewClient());
 
                   WebSettings settings = webView.getSettings();
                   settings.setJavaScriptEnabled(true);
                   settings.setDomStorageEnabled(true);
                   settings.setAllowFileAccess(true);
                   settings.setAllowContentAccess(true);
+
+                  webView.setWebViewClient(new WebViewClient());
 
                   webView.loadUrl("file:///android_asset/index.html");
 
@@ -150,13 +157,15 @@ jobs:
           }
           EOF
 
-      - name: Siapkan Gradle
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.10.2'
+          gradle-version: '8.7'
 
       - name: Build APK
-        run: gradle assembleDebug --no-daemon
+        shell: bash
+        run: |
+          gradle assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
