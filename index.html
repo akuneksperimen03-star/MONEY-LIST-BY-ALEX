@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071a3d">
+<title>LIST MONEY</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(160deg,#06183a 0%,#0c2f69 38%,#f8fbff 72%,#fff 100%);background-attachment:fixed;color:#14213d;min-height:100vh}
+.container{max-width:620px;margin:auto;padding:22px 16px 90px}
+.brand{margin:4px 0 22px;padding:12px 4px 14px;border-radius:18px;background:transparent;box-shadow:none}
+.brand h1{margin:0;font-size:31px;font-weight:900;letter-spacing:1px;background:linear-gradient(90deg,#06245b,#55a9ff);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:2px #fff;text-shadow:0 3px 10px #001b44}.brand .production{margin:5px 0 0;font-size:11px;font-weight:800;letter-spacing:2px;color:#dcecff}.update-info{margin-top:5px;font-size:8px;line-height:1.45;letter-spacing:.7px;color:#d7e7ff;font-weight:600;max-width:520px}
+.card{background:#ffffffee;border:1px solid #ffffff80;border-radius:22px;padding:20px;box-shadow:0 10px 30px #00133b25;margin-bottom:16px;backdrop-filter:blur(10px)}
+.balance{position:relative;overflow:hidden;background:linear-gradient(145deg,#06183a,#16478f 62%,#fff);color:white;border:0;min-height:190px}
+.balance:after{content:"";position:absolute;width:150%;height:72px;left:-25%;bottom:-55px;background:#fff;border-radius:50% 50% 0 0/100% 100% 0 0;opacity:.96;z-index:1}.balance .stats{position:relative;z-index:2}
+.balance small{opacity:.8}.balance h2{font-size:31px;margin:8px 0 20px;position:relative;z-index:1}
+.stats{display:flex;gap:10px;position:relative;z-index:2}.stat{flex:1;background:#ffffff18;border:1px solid #ffffff30;padding:12px;border-radius:13px;font-size:12px}.stat b{display:block;margin-top:5px;font-size:14px}
+button{border:0;border-radius:13px;padding:14px 16px;font-size:15px;font-weight:bold;cursor:pointer}
+.add{width:100%;background:linear-gradient(90deg,#06183a,#1455a3);color:white;margin-bottom:16px;box-shadow:0 8px 18px #06183a35}
+.section-title{font-size:19px;font-weight:bold;margin:4px 0 12px;color:#102858}
+.tx{display:flex;align-items:center;justify-content:space-between;padding:15px 0;border-bottom:1px solid #e7ebf2}.tx:last-child{border:0}
+.tx-left{min-width:0}.note{font-weight:bold}.meta{font-size:12px;color:#7b8495;margin-top:5px}.amount{font-weight:bold;white-space:nowrap;margin-left:10px}
+.in{color:#16803c}.out{color:#c62828}.empty{text-align:center;color:#8a93a3;padding:25px}
+.modal{display:none;position:fixed;inset:0;background:#00112dcc;z-index:5;align-items:flex-end;justify-content:center}.modal.show{display:flex}
+.sheet{background:linear-gradient(180deg,#fff,#f5f8fd);width:100%;max-width:620px;border-radius:25px 25px 0 0;padding:22px;box-shadow:0 -10px 35px #00133b30}
+label{font-size:13px;color:#52617a;display:block;margin:11px 0 5px}
+input,select{width:100%;padding:14px;border:1px solid #d7dce5;border-radius:12px;font-size:16px;background:white;outline:none}
+input:focus,select:focus{border-color:#1455a3;box-shadow:0 0 0 3px #1455a318}
+.actions{display:flex;gap:10px;margin-top:18px}.actions button{flex:1}
+.footer{text-align:center;color:#ffffffb8;font-size:10px;letter-spacing:1.5px;margin-top:25px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="brand"><h1>LIST MONEY</h1><p class="production">PRODUCTION BY ALEX</p><div class="update-info">UPDATE TERBARU YANG HANYA TERCATAT DARI TANGGAL 5 OKTOBER 2026</div><div class="update-info">PEMASUKAN DAN PENGELUARAN SEBELUMNYA TIDAK TERCATAT</div></div>
+
+  <div class="card balance">
+    <small>Saldo Saat Ini</small>
+    <h2 id="balance">Rp0</h2>
+    <div class="stats">
+      <div class="stat">Pemasukan<b id="income">Rp0</b></div>
+      <div class="stat">Pengeluaran<b id="expense">Rp0</b></div>
+    </div>
+  </div>
+
+  <button class="add" onclick="openModal()">＋ Tambah Transaksi</button>
+
+  <div class="card">
+    <div class="section-title">Riwayat Transaksi</div>
+    <div id="list"></div>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <div class="section-title" id="modalTitle">Tambah Transaksi</div>
+    <label>Jenis Transaksi</label>
+    <select id="type"><option value="out">PENGELUARAN</option><option value="in">PEMASUKAN</option></select>
+    <label>Nominal (Rp)</label>
+    <input id="amount" type="number" inputmode="numeric" placeholder="">
+    <label id="noteLabel">UNTUK</label>
+    <input id="note" placeholder="">
+    <label>CATATAN</label>
+    <input id="category" placeholder="">
+    <div class="actions">
+      <button class="danger" onclick="closeModal()">Batal</button>
+      <button id="saveBtn" style="background:#1565c0;color:white" onclick="addTransaction()">Simpan Transaksi</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">LIST MONEY • PRODUCTION BY ALEX</div>
+</div>
+
+<script>
+const KEY="catatan_keuangan_v1";
+let transactions=[];
+let editingId=null;
+
+function rupiah(n){return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(n)}
+function save(){localStorage.setItem(KEY,JSON.stringify(transactions))}
+function render(){
+  const income=transactions.filter(x=>x.type==="in").reduce((a,x)=>a+x.amount,0);
+  const expense=transactions.filter(x=>x.type==="out").reduce((a,x)=>a+x.amount,0);
+  document.getElementById("income").textContent=rupiah(income);
+  document.getElementById("expense").textContent=rupiah(expense);
+  document.getElementById("balance").textContent=rupiah(income-expense);
+  const list=document.getElementById("list");
+  if(!transactions.length){list.innerHTML='<div class="empty">Belum ada transaksi.</div>';return}
+  list.innerHTML=transactions.slice().sort((a,b)=>b.id-a.id).map(x=>`
+    <div class="tx">
+      <div class="tx-left">
+        <div class="note">${escapeHtml(x.note)}</div>
+        <div class="meta">${escapeHtml(x.category)} • ${x.date}</div>
+      </div>
+      <div class="tx-right">
+        <div class="amount ${x.type}">${x.type==="in"?"+":"-"} ${rupiah(x.amount)}</div>
+        
+      </div>
+    </div>
+  `).join("");
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function openModal(){editingId=null;document.getElementById("modal").classList.add("show");document.getElementById("modalTitle").textContent="Tambah Transaksi";document.getElementById("saveBtn").textContent="Simpan Transaksi";document.getElementById("amount").focus(); updateLabel()}
+function closeModal(){document.getElementById("modal").classList.remove("show");editingId=null}
+function updateLabel(){document.getElementById("noteLabel").textContent=document.getElementById("type").value==="in"?"SUMBER":"UNTUK"}
+document.getElementById("type").addEventListener("change",updateLabel);
+function editTransaction(id){
+  const x=transactions.find(t=>t.id===id); if(!x)return;
+  editingId=id;
+  document.getElementById("type").value=x.type;
+  document.getElementById("amount").value=x.amount;
+  document.getElementById("note").value=x.note==="Tanpa keterangan"?"":x.note;
+  document.getElementById("category").value=x.category==="Tanpa catatan"?"":x.category;
+  document.getElementById("modalTitle").textContent="Edit Transaksi";
+  document.getElementById("saveBtn").textContent="Simpan Perubahan";
+  updateLabel(); document.getElementById("modal").classList.add("show");
+  setTimeout(()=>document.getElementById("amount").focus(),50);
+}
+function addTransaction(){
+  const amount=Number(document.getElementById("amount").value);
+  if(!amount||amount<=0){alert("Masukkan nominal yang benar.");return}
+  const note=document.getElementById("note").value.trim()||"Tanpa keterangan";
+  const category=document.getElementById("category").value.trim()||"Tanpa catatan";
+  if(editingId!==null){
+    const x=transactions.find(t=>t.id===editingId);
+    if(x){x.type=document.getElementById("type").value;x.amount=amount;x.note=note;x.category=category;}
+  }else{
+    const date=new Date().toLocaleDateString("id-ID");
+    transactions.push({id:Date.now(),type:document.getElementById("type").value,amount,note,category,date});
+  }
+  save();render();closeModal();
+  document.getElementById("amount").value="";document.getElementById("note").value="";document.getElementById("category").value="";
+}
+document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()});
+render();
+</script>
+</body>
+</html>
