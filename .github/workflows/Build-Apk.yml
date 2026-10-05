@@ -1,4 +1,4 @@
-name: Build APK LIST MONEY
+name: Build APK MONEY LIST
 
 on:
   workflow_dispatch:
