@@ -1,4 +1,4 @@
-name: Build APK LIST MONEY
+name: Build APK DAFTAR UANG
 
 on:
   workflow_dispatch:
@@ -22,14 +22,15 @@ jobs:
 
       - name: Siapkan Android SDK
         uses: android-actions/setup-android@v3
-  
+
       - name: Terima lisensi Android SDK
-        run: |
-          yes | sdkmanager --licenses
+        run: yes | sdkmanager --licenses
 
       - name: Install Android SDK
         run: |
           sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Buat project Android
         run: |
           mkdir -p app/src/main/java/com/alex/listmoney
           mkdir -p app/src/main/assets
@@ -88,8 +89,7 @@ jobs:
               <application
                   android:theme="@android:style/Theme.Material.Light.NoActionBar"
                   android:label="LIST MONEY"
-                  android:hardwareAccelerated="true"
-                  android:usesCleartextTraffic="true">
+                  android:hardwareAccelerated="true">
 
                   <activity
                       android:name=".MainActivity"
@@ -161,5 +161,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: LIST-MONEY-By-ALEX-APK
+          name: LIST-MONEY-BY-ALEX-APK
           path: app/build/outputs/apk/debug/app-debug.apk
