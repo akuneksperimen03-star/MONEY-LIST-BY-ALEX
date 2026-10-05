@@ -22,12 +22,14 @@ jobs:
 
       - name: Siapkan Android SDK
         uses: android-actions/setup-android@v3
+  
+      - name: Terima lisensi Android SDK
+        run: |
+          yes | sdkmanager --licenses
 
       - name: Install Android SDK
         run: |
           sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
-
-      - name: Buat project Android
         run: |
           mkdir -p app/src/main/java/com/alex/listmoney
           mkdir -p app/src/main/assets
